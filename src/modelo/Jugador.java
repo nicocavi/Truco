@@ -77,7 +77,7 @@ public class Jugador {
 			envido = envido + cUno.getNum();
 		}
 		if(cDos.getNum() != 10 && cDos.getNum() != 11 && cDos.getNum() != 12) {
-			envido = envido + cUno.getNum();
+			envido = envido + cDos.getNum();
 		}
 		
 		return envido;
@@ -92,12 +92,25 @@ public class Jugador {
 		}else if(cartas.get(1).getPalo() == cartas.get(2).getPalo()) {
 			return sumarValor(cartas.get(1), cartas.get(2));
 		}else {
-			if(cartas.get(1).getNum() > cartas.get(2).getNum() && cartas.get(1).getNum() > cartas.get(0).getNum()) {
-				return cartas.get(1).getNum();
-			}else if(cartas.get(0).getNum() > cartas.get(2).getNum() && cartas.get(0).getNum() > cartas.get(1).getNum()) {
-				return cartas.get(0).getNum();
-			}else{
-				return cartas.get(2).getNum();
+			ArrayList<Carta> aux= cartas; 
+			for(int i = 0; i < cartas.size()-1; i++) {
+				for(int j = 0; j < cartas.size()-1;j++) {
+					if(aux.get(j).getNum() < aux.get(j+1).getNum()) {
+						Carta menor = aux.get(j);
+						aux.set(j, aux.get(j+1));
+						aux.set(j+1, menor);
+					}
+				}
+			}
+			System.out.println(aux.get(0).getNum()+" - "+aux.get(1).getNum()+" - "+aux.get(2).getNum());
+			if(aux.get(0).getNum() < 10) {
+				return aux.get(0).getNum();
+			}else if(aux.get(1).getNum() < 10) {
+				return aux.get(1).getNum();
+			}else if(aux.get(2).getNum() < 10) {
+				return aux.get(2).getNum();
+			}else {
+				return 0;
 			}
 		}
 	}

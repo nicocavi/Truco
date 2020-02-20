@@ -53,6 +53,7 @@ public class VistaConsolaDos {
 					while (controlador.getEstadoJuego() == EstadoJuego.JUGANDO) {
 						mostrarTablero();
 						opciones();
+						System.out.println(controlador.getEstadoJuego().toString());
 					}
 				}
 			}
@@ -68,22 +69,35 @@ public class VistaConsolaDos {
 		
 		ArrayList<CantoJuego> cantos = controlador.cantosDisponibles();
 		if(controlador.hayCantoPendiente()) {
+			//Si hay un canto pendiente
 			
 			if(controlador.getCanto().getEstado() && controlador.getCanto().getCanto() != CantoJuego.TRUCO && controlador.getCanto().getCanto() != CantoJuego.RETRUCO && controlador.getCanto().getCanto() != CantoJuego.VALECUATRO ){
+				//Si se acepto envido o flor (o variantes)
 				opcion = -1;
 				System.out.println("Elija una opcion: ");
-				while(opcion < 0 || opcion > cantos.size()+2) {
+				while(opcion < 0 || opcion > 1) {
 					System.out.println("Tus puntos para "+ controlador.getCanto().getCanto().toString()+ " son: "+controlador.getPuntosCanto());
 					System.out.println("-----------------------------------------------------------");
-					System.out.println("0) Me retiro");
+					System.out.println("0) No quiero");
 					System.out.println("1) Cantar");
+					opcion = sc.nextInt();
 				}
-			}else {
+				if(opcion == 0) {
+					System.out.println("NO QUIERO!");
+					controlador.respuestaJugador(false);
+				}else if(opcion == 1) {
+					System.out.println(controlador.getPuntosCanto());
+					controlador.respuestaJugador(true);
+				}
+				
+			}else if(!controlador.getCanto().getEstado()){
+				//Si hay canto pendiente que no fue aceptado
+				
 				System.out.println(controlador.getCanto());
 				opcion = -1;
 				while(opcion < 0 || opcion > cantos.size()+2) {
 					System.out.println("----------------------------------------------");
-					System.out.println(controlador.getOponente()+" dice "+controlador.getCanto().toString() +"!!!");
+					System.out.println(controlador.getOponente()+" dice "+controlador.getCanto().getCanto().toString()+"!!!");
 					System.out.println("Elija una opcion:");	
 					for(int i = 1; i <= cantos.size(); i++) {
 						System.out.println(i+") "+cantos.get(i-1).toString());
@@ -95,28 +109,50 @@ public class VistaConsolaDos {
 					
 					if(opcion < 0 || opcion > cantos.size()+2) {
 						System.out.println("ERROR, OPCION NO VALIDA!!!");
-					}else if(opcion == cantos.size()+1){
-						//Acepta el canto realizado por el rival
-						controlador.aceptarCanto();
-						
-					}else if(opcion == cantos.size()+2) {
-						//Rechaza el canto realizado por el rival
-						controlador.rechazarCanto();
-						
-					}else if(opcion == 0){
-						//El Jugador se retira de la mano actual
-						System.out.println("ENTRO A FIN MANO");
-						controlador.finMano();
-						
-					}else {
-						System.out.println("EL JUGADOR CANTO!!!------------------------------ OPCION: "+opcion);
-						//El Jugador realiza un nuevo canto
-						controlador.cantar(cantos.get(opcion - 1));
 					}
+				} 
+				if(opcion == cantos.size()+1){
+					//Acepta el canto realizado por el rival
+					controlador.aceptarCanto();
+				}else if(opcion == cantos.size()+2) {
+					//Rechaza el canto realizado por el rival
+					controlador.rechazarCanto();
+				}else if(opcion == 0){
+					//El Jugador se retira de la mano actual
+					System.out.println("ENTRO A FIN MANO");
+					controlador.finMano();
+				}else {
+					//El Jugador realiza un nuevo canto
+					controlador.cantar(cantos.get(opcion - 1));
+				}
+				
+			}else if(controlador.getCanto().getCanto() == CantoJuego.TRUCO || controlador.getCanto().getCanto() == CantoJuego.RETRUCO || controlador.getCanto().getCanto() == CantoJuego.VALECUATRO){
+				opcion = -1;
+				ArrayList<Carta> mano = controlador.getManoJugador(controlador.getTurno());
+				while(opcion < 0 || opcion > mano.size()+cantos.size()) {
+					System.out.println("----------------------------------------------");
+					System.out.println("Elija una opcion:");
+					for(int i = 1; i <= cantos.size(); i++) {
+						System.out.println(i+mano.size()+") "+cantos.get(i-1).toString());
+					}
+					System.out.println("0) Me retiro");
+					opcion = sc.nextInt();
+					if(opcion < 0 || opcion > mano.size()+cantos.size()){
+						System.out.println("ERROR, OPCION NO VALIDA!!!");
+					}
+				}
+				if(opcion == 0){
+					//El Jugador se retira de la mano actual
+					controlador.finMano();
+				}else if(opcion > 0 && opcion <= mano.size()) {
+					//El Jugador tira una carta
+					controlador.tirarCarta(opcion-1);
+				}else {
+					//El Jugador realiza un nuevo canto
+					controlador.cantar(cantos.get(opcion - mano.size() - 1));
 				}
 			}
 		}else {
-			System.out.println("NO HAY CANTO PENDIENTE");
 			opcion = -1;
 			ArrayList<Carta> mano = controlador.getManoJugador(controlador.getTurno());
 			while(opcion < 0 || opcion > mano.size()+cantos.size()) {

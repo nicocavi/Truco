@@ -95,4 +95,8 @@ public class Controlador {
 	public int getPuntosCanto() {
 		return juego.getPuntosCanto();
 	}
+	
+	public void respuestaJugador(boolean respuesta) {
+		juego.respuestaJugador(respuesta);
+	}
 }

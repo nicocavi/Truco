@@ -14,9 +14,11 @@ public class Juego {
 	private int turnoInicio;
 	private Mazo mazo;
 	private int jugadas;
+	private CantoJuego cantoJugador;
 	
 	public Juego() {
 		estadoJuego = EstadoJuego.SETEANDO;
+		puntosLimite = 30;
 		jugadores = new ArrayList<Jugador>();
 		turnoInicio = 1;
 	}
@@ -34,7 +36,7 @@ public class Juego {
 	public void tirarCarta(int carta) {
 		
 		Carta cartaAux = jugadores.get(turno).tirarCarta(carta);
-		
+		jugadas++;
 		if(turno == 0) {
 			mesa.setMesaJUno(cartaAux);
 		}else {
@@ -56,11 +58,10 @@ public class Juego {
 			calcularPuntos(jugadores.get(1));
 		}else if(j1 >= 2) {
 			calcularPuntos(jugadores.get(0));
-		}else if(ronda == 3){
+		}else if(ronda >= 2){
 			calcularPuntos(jugadores.get(turnoInicio));
 		}else {
 			if(finRonda()) {
-				System.out.println("ES FINAL DE LA RONDA");
 				if(turnosGanados.get(ronda-1) == -1) {
 					turno = turnoInicio;
 				}else {
@@ -142,12 +143,13 @@ public class Juego {
 		estadoCanto.aceptarCanto();
 		
 		CantoJuego aux = estadoCanto.getCanto().getCanto();
+		turno = jugadores.indexOf(estadoCanto.getPrimerCanto().getJugador());
 		
-		if(aux != CantoJuego.TRUCO && aux != CantoJuego.RETRUCO && aux != CantoJuego.VALECUATRO) {
+		/*if(aux != CantoJuego.TRUCO && aux != CantoJuego.RETRUCO && aux != CantoJuego.VALECUATRO) {
 			turno = jugadores.indexOf(estadoCanto.getCanto().getJugador());
 		}else {
 			siguienteTurno();
-		}
+		}*/
 		
 		
 	}
@@ -161,7 +163,7 @@ public class Juego {
 	}
 	
 	public void finMano() {
-		if(ronda == 1 && !estadoCanto.getTruco() && !estadoCanto.getEnvido() && !estadoCanto.getFlor()) {
+		if(ronda == 0 && !estadoCanto.getTruco() && !estadoCanto.getEnvido() && !estadoCanto.getFlor()) {
 			if (turno == 0) {
 				jugadores.get(1).addPuntos(2);
 			}else {
@@ -203,6 +205,28 @@ public class Juego {
 		}
 	}
 	
+	
+	
+	public void respuestaJugador(boolean respuesta) {
+		if(respuesta) {
+			if(cantoJugador == CantoJuego.VACIO) {
+				cantoJugador = CantoJuego.ACEPTO;
+				siguienteTurno();
+			}else {
+				calcularPuntos(ganadorCanto());
+			}
+			
+		}else {
+			cantoJugador = CantoJuego.NOACEPTO;
+			rechazarCanto();
+		}
+		
+	}
+	
+	public CantoJuego getCantoJugador() {
+		return cantoJugador;
+	}
+	
 	// METODOS PRIVADOS --------------------------------- 
 	
 	
@@ -211,13 +235,14 @@ public class Juego {
 			
 			jugadores.get(0).limpiarMano();
 			jugadores.get(1).limpiarMano();
+			cantoJugador = CantoJuego.VACIO;
 			
 			manosGanadas = new ArrayList<Integer>();
 			for(int i = 0; i < 3; i++) {
 				manosGanadas.add(-1);
 			}
 			jugadas=0;
-			ronda = 1;
+			ronda = 0;
 			mazo = new Mazo();
 			repartirCartas();
 			if(turnoInicio == 1) {
@@ -244,6 +269,7 @@ public class Juego {
 	private boolean finRonda() {
 		
 		if((jugadas % 2) == 0 && jugadas != 0) {
+			ronda++;
 			return true;
 		}
 		return false;
@@ -257,29 +283,13 @@ public class Juego {
 	}
 	
 	private void siguienteTurno() {
-		
-		jugadas++;
-		
-		if(turno == 0) {
-			turno = 1;
-		}else {
-			turno = 0;
-		}
-		
-		if(turno == turnoInicio) {
-			ronda++;
-		}
-	}
-	
-	private void siguienteTurnoCanto() {
+
 		if(turno == 0) {
 			turno = 1;
 		}else {
 			turno = 0;
 		}
 	}
-	
-	
 	
 	private void calcularPuntos(Jugador ganador) {
 		Canto canto = estadoCanto.getCanto();
@@ -312,6 +322,12 @@ public class Juego {
 					break;
 				case ENVIDOX2REALENVIDO:
 					ganador.addPuntos(7);
+					break;
+				case FLOR:
+					ganador.addPuntos(4);
+					break;
+				case CONTRAFLOR:
+					ganador.addPuntos(6);
 					break;
 				default:
 					if(jugadorGanador().getPuntos() > puntosLimite/2 ) {
@@ -366,6 +382,15 @@ public class Juego {
 				case ENVIDOX2REALENVIDOFALTAENVIDO:
 					ganador.addPuntos(7);
 					break;
+				case FLOR:
+					ganador.addPuntos(3);
+					break;
+				case CONTRAFLOR:
+					ganador.addPuntos(4);
+					break;
+				case CONTRAFLORALRESTO:
+					ganador.addPuntos(6);
+					break;
 				default:
 					ganador.addPuntos(1);
 					break;
@@ -376,7 +401,7 @@ public class Juego {
 			estadoJuego = EstadoJuego.FINALIZANDO;
 		}else {
 			
-			if(canto.getCanto() == CantoJuego.TRUCO || canto.getCanto() == CantoJuego.RETRUCO || canto.getCanto() == CantoJuego.VALECUATRO) {
+			if(canto.getCanto() == CantoJuego.TRUCO || canto.getCanto() == CantoJuego.RETRUCO || canto.getCanto() == CantoJuego.VALECUATRO || canto.getCanto() == CantoJuego.VACIO) {
 				iniciar();
 			}else {
 				estadoCanto.limpiarCantos();
@@ -395,5 +420,24 @@ public class Juego {
 		}
 	}
 	
-	
+	private Jugador ganadorCanto() {
+		cantoJugador = CantoJuego.VACIO;
+		if(estadoCanto.getCanto().getCanto().ordinal() > 0 && estadoCanto.getCanto().getCanto().ordinal() < 12) {
+			if(jugadores.get(0).calcularEnvido() < jugadores.get(1).calcularEnvido()) {
+				return jugadores.get(1);
+			}else if(jugadores.get(0).calcularEnvido() > jugadores.get(1).calcularEnvido()){
+				return jugadores.get(0);
+			}else {
+				return jugadores.get(turnoInicio);
+			}
+		}else{
+			if(jugadores.get(0).calcularFlor() < jugadores.get(1).calcularFlor()) {
+				return jugadores.get(1);
+			}else if(jugadores.get(0).calcularFlor() > jugadores.get(1).calcularFlor()){
+				return jugadores.get(0);
+			}else {
+				return jugadores.get(turnoInicio);
+			}
+		}
+	}
 }
