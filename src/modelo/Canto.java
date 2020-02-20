@@ -1,6 +1,8 @@
 package modelo;
 
-public class Canto {
+import java.io.Serializable;
+
+public class Canto implements Serializable{
 	private CantoJuego cantoJuego;
 	private Jugador jugador;
 	private boolean estado;

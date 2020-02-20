@@ -33,11 +33,12 @@ public class Juego {
 		}
 	}
 
-	public void tirarCarta(int carta) {
-		
-		Carta cartaAux = jugadores.get(turno).tirarCarta(carta);
+	public void tirarCarta(int carta, int indice) {
+		System.out.println("Ronda: "+ronda);
+		Carta cartaAux = jugadores.get(indice).tirarCarta(carta);
 		jugadas++;
-		if(turno == 0) {
+		System.out.println("Jugada luego de aumentar: "+jugadas);
+		if(indice == 0) {
 			mesa.setMesaJUno(cartaAux);
 		}else {
 			mesa.setMesaJDos(cartaAux);
@@ -58,7 +59,7 @@ public class Juego {
 			calcularPuntos(jugadores.get(1));
 		}else if(j1 >= 2) {
 			calcularPuntos(jugadores.get(0));
-		}else if(ronda >= 2){
+		}else if(ronda > 2){
 			calcularPuntos(jugadores.get(turnoInicio));
 		}else {
 			if(finRonda()) {
@@ -79,47 +80,39 @@ public class Juego {
 		return estadoJuego;
 	}
 	
-	public String getNombreJUno() {
-		return jugadores.get(0).getNombre();
+	public String getNombreOponente(int indice) {
+		return jugadores.get(indice).getNombre();
 	}
 	
 	public String getNombreJDos() {
 		return jugadores.get(1).getNombre();
 	}
 
-	public int getPuntosJUno() {
-		return jugadores.get(0).getPuntos();
-	}
-	
-	public int getPuntosJDos() {
-		return jugadores.get(1).getPuntos();
+	public int getPuntos(int indice) {
+		return jugadores.get(indice).getPuntos();
 	}
 	
 	public String getTurnoJugador() {
 		return jugadores.get(turno).getNombre();
 	}
 	
-	public ArrayList<Carta> getManoJugador(String nombre){
-		return buscarJugador(nombre).getMano();
+	public ArrayList<Carta> getManoJugador(int indice){
+		return jugadores.get(indice).getMano();
 	}
 	
-	public String getMesaJUno(){
-		return mesa.getMesaJUno();
-	}
-	
-	public String getMesaJDos(){
-		return mesa.getMesaJDos();
+	public String getMesa(int indice){
+		return mesa.getMesa(indice);
 	}
 	
 	public boolean hayCantoPendiente() {
 		return estadoCanto.hayCantoPendiente();
 	}
 	
-	public String getOponente() {
-		if(turno == 0) {
-			return jugadores.get(1).getNombre();
+	public int getOponente(int indice) {
+		if(indice == 0) {
+			return 1;
 		}else {
-			return jugadores.get(0).getNombre();
+			return 0;
 		}
 	}
 	
@@ -145,24 +138,17 @@ public class Juego {
 		CantoJuego aux = estadoCanto.getCanto().getCanto();
 		turno = jugadores.indexOf(estadoCanto.getPrimerCanto().getJugador());
 		
-		/*if(aux != CantoJuego.TRUCO && aux != CantoJuego.RETRUCO && aux != CantoJuego.VALECUATRO) {
-			turno = jugadores.indexOf(estadoCanto.getCanto().getJugador());
-		}else {
-			siguienteTurno();
-		}*/
-		
-		
 	}
 	
-	public void rechazarCanto() {
-		if (turno == 0) {
+	public void rechazarCanto(int indice) {
+		if (indice == 0) {
 			calcularPuntos(jugadores.get(1));
 		}else {
 			calcularPuntos(jugadores.get(0));
 		}
 	}
 	
-	public void finMano() {
+	public void finMano(int indice) {
 		if(ronda == 0 && !estadoCanto.getTruco() && !estadoCanto.getEnvido() && !estadoCanto.getFlor()) {
 			if (turno == 0) {
 				jugadores.get(1).addPuntos(2);
@@ -172,7 +158,7 @@ public class Juego {
 			iniciar();	
 		}else {
 			
-			if (turno == 0) {
+			if (indice == 0) {
 				jugadores.get(1).addPuntos(1);
 				if(estadoCanto.getCanto().getCanto() != CantoJuego.VACIO) {
 					calcularPuntos(jugadores.get(1));
@@ -190,8 +176,8 @@ public class Juego {
 		
 	}
 	
-	public void addCanto(CantoJuego canto) {
-		estadoCanto.addCanto(new Canto(canto, jugadores.get(turno)));
+	public void addCanto(CantoJuego canto, int indice) {
+		estadoCanto.addCanto(new Canto(canto, jugadores.get(indice)));
 		siguienteTurno();
 	}
 	
@@ -207,7 +193,7 @@ public class Juego {
 	
 	
 	
-	public void respuestaJugador(boolean respuesta) {
+	public void respuestaJugador(boolean respuesta, int indice) {
 		if(respuesta) {
 			if(cantoJugador == CantoJuego.VACIO) {
 				cantoJugador = CantoJuego.ACEPTO;
@@ -218,7 +204,7 @@ public class Juego {
 			
 		}else {
 			cantoJugador = CantoJuego.NOACEPTO;
-			rechazarCanto();
+			rechazarCanto(indice);
 		}
 		
 	}
@@ -439,5 +425,9 @@ public class Juego {
 				return jugadores.get(turnoInicio);
 			}
 		}
+	}
+
+	public int getCantidadJugadores() {
+		return jugadores.size();
 	}
 }

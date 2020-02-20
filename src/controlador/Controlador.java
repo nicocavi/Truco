@@ -1,5 +1,6 @@
 package controlador;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import modelo.Canto;
@@ -7,96 +8,101 @@ import modelo.CantoJuego;
 import modelo.Carta;
 import modelo.EstadoJuego;
 import modelo.Juego;
+import modelo.OperacionClienteRMI;
+import vista.IVistas;
 
 public class Controlador {
 	
-	private Juego juego;
+	private ArrayList<IVistas> vistas = new ArrayList<IVistas>();
 	
-	public Controlador() {
-		juego = new Juego();
+	private OperacionClienteRMI cliente;
+	
+	public Controlador(OperacionClienteRMI cliente) {
+		this.cliente=cliente;
+		this.cliente.setControlador(this);
 	}
 	
-	public void nuevoJugador(String nombre) {
-		juego.agregarJugador(nombre);
+	public void agregarVista(IVistas vista) {
+		vistas.add(vista);
 	}
 	
-	public EstadoJuego getEstadoJuego() {
-		return juego.getEstado();
+	public void cambiarIP(String serverAddress, int serverPort)throws RemoteException {
+		cliente.cambiarIP(serverAddress, serverPort);	
+	}	
+	
+	public void nuevoJugador(String nombre) throws RemoteException {
+		cliente.agregarJugador(nombre);
 	}
 	
-	public String getNombreJUno() {
-		return juego.getNombreJUno();
+	public EstadoJuego getEstadoJuego() throws RemoteException {
+		return cliente.getEstadoJuego();
 	}
 	
-	public String getNombreJDos() {
-		return juego.getNombreJDos();
+	public String getNombreOponente(int indice) throws RemoteException{
+		return cliente.getNombreOponente(indice);
 	}
 
-	public int getPuntosJUno() {
-		return juego.getPuntosJUno();
+	public int getPuntos(int indice) throws RemoteException {
+		return cliente.getPuntos(indice);
 	}
 	
-	public int getPuntosJDos() {
-		return juego.getPuntosJDos();
+	public String getTurno() throws RemoteException {
+		return cliente.getTurno();
 	}
 	
-	public String getTurno() {
-		return juego.getTurnoJugador();
+	public ArrayList<Carta> getManoJugador(int indice) throws RemoteException{
+		return cliente.getManoJugador(indice);
 	}
 	
-	public ArrayList<Carta> getManoJugador(String nombre){
-		return juego.getManoJugador(nombre);
+	public String getMesa(int indice) throws RemoteException {
+		return cliente.getMesa(indice);
 	}
 	
-	public String getMesaJUno() {
-		return juego.getMesaJUno();
+	public boolean hayCantoPendiente() throws RemoteException {
+		return cliente.hayCantoPendiente();
 	}
 	
-	public String getMesaJDos() {
-		return juego.getMesaJDos();
+	public int getOponente(int indice) throws RemoteException {
+		return cliente.getOponente(indice);
 	}
 	
-	public boolean hayCantoPendiente() {
-		return juego.hayCantoPendiente();
+	public Canto getCanto() throws RemoteException {
+		return cliente.getCanto();
 	}
 	
-	public String getOponente() {
-		return juego.getOponente();
+	public  ArrayList<CantoJuego> cantosDisponibles() throws RemoteException{
+		return cliente.cantosDisponibles();
 	}
 	
-	public Canto getCanto() {
-		return juego.getCanto();
+	public void aceptarCanto() throws RemoteException {
+		cliente.aceptarCanto();
 	}
 	
-	public  ArrayList<CantoJuego> cantosDisponibles(){
-		return juego.cantosDisponibles();
+	public void rechazarCanto(int indice) throws RemoteException {
+		cliente.rechazarCanto(indice);
 	}
 	
-	public void aceptarCanto() {
-		juego.aceptarCanto();
+	public void finMano(int indice) throws RemoteException {
+		cliente.finMano(indice);
 	}
 	
-	public void rechazarCanto() {
-		juego.rechazarCanto();
+	public void cantar(CantoJuego canto, int indice) throws RemoteException {
+		cliente.addCanto(canto, indice);
 	}
 	
-	public void finMano() {
-		juego.finMano();
+	public void tirarCarta(int carta, int indice) throws RemoteException {
+		cliente.tirarCarta(carta, indice);
 	}
 	
-	public void cantar(CantoJuego canto) {
-		juego.addCanto(canto);
+	public int getPuntosCanto() throws RemoteException {
+		return cliente.getPuntosCanto();
 	}
 	
-	public void tirarCarta(int carta) {
-		juego.tirarCarta(carta);
+	public int getCantidadJugadores() throws RemoteException{
+		return cliente.getCantidadJugadores();
 	}
 	
-	public int getPuntosCanto() {
-		return juego.getPuntosCanto();
-	}
-	
-	public void respuestaJugador(boolean respuesta) {
-		juego.respuestaJugador(respuesta);
+	public void respuestaJugador(boolean respuesta, int indice) throws RemoteException {
+		cliente.respuestaJugador(respuesta, indice);
 	}
 }

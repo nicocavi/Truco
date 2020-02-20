@@ -94,10 +94,10 @@ public class EstadoCanto {
 			flor = true;
 		}
 		
-		if(cantos.get(0).getCanto() == CantoJuego.TRUCO && canto.getCanto() != CantoJuego.RETRUCO && canto.getCanto() != CantoJuego.VALECUATRO) {
+		if(getCanto().getCanto() == CantoJuego.TRUCO && canto.getCanto() != CantoJuego.RETRUCO && canto.getCanto() != CantoJuego.VALECUATRO) {
 			cantoPendiente = cantos.get(0);
 			cantos.set(0, canto);
-		}else if(cantos.get(0).getCanto() == CantoJuego.VACIO){
+		}else if(getCanto().getCanto() == CantoJuego.VACIO || getCanto().getEstado()){
 			cantos.set(0, canto);
 		}else {
 			cantos.add(canto);

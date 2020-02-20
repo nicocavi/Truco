@@ -13,20 +13,21 @@ public class Mesa {
 		turnosGanados = new ArrayList<Integer>();
 	}
 	
-	public String getMesaJUno(){
-		if(mesaJUno.size() != 0){
-			return mesaJUno.get(mesaJUno.size()-1).getToString();	
+	public String getMesa(int indice){
+		if(indice == 0) {
+			if(mesaJUno.size() != 0){
+				return mesaJUno.get(mesaJUno.size()-1).getToString();	
+			}else {
+				return "VACIO";
+			}
 		}else {
-			return "VACIO";
+			if(mesaJDos.size() != 0){
+				return mesaJDos.get(mesaJDos.size()-1).getToString();	
+			}else {
+				return "VACIO";
+			}
 		}
-	}
-	
-	public String getMesaJDos(){
-		if(mesaJDos.size() != 0){
-			return mesaJDos.get(mesaJDos.size()-1).getToString();	
-		}else {
-			return "VACIO";
-		}
+		
 	}
 	
 	public void setMesaJUno(Carta carta){
